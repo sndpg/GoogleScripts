@@ -20,7 +20,8 @@ var labelMap = [
     ], [GmailApp.getUserLabelByName("Twitter")])
 ];
 
-var deletionMap = [new DeletionMapping(GmailApp.getUserLabelByName("Twitch"), "", 1)];
+var deletionMap = [new DeletionMapping(GmailApp.getUserLabelByName("Twitch"), "", 1),
+  new DeletionMapping(GmailApp.getUserLabelByName("Twitter"), "", 3)];
 
 function LabelMapping(from, subjectKeyWords, labels) {
     this.from = from;
@@ -28,7 +29,7 @@ function LabelMapping(from, subjectKeyWords, labels) {
     this.labels = labels;
 }
 
-function DeletionMapping(label, operation, keepDays){
+function DeletionMapping(label, operation, keepDays) {
     this.label = label;
     this.operation = operation;
     this.keepDays = keepDays;
@@ -86,6 +87,37 @@ function getLabels(from, subject) {
 }
 
 function checkMessagesForDeletion() {
+    var threads = null,
+        messages = null;
+    for (i in deletionMap) {
+        threads = deletionMap[i].label.getThreads();
+
+        for (j in threads) {
+            messages = threads[j].getMessages();
+
+            for (k in messages) {
+                if (checkMessageDeletionOptions(deletionMap[i], messages[k])) {
+                    messages[k].moveToTrash();
+                }
+            }
+        }
+    }
+}
+
+function checkMessageDeletionOptions(deletionMap, message) {
+    var retVal = false;
+    // implement logic for various operation-strings (from deletionMapping-object)
+    // for now: only the "keep max of n days before deletion"-option
+    Logger.log("message.getDate(): " + message.getDate());
+    Logger.log("Date(Date.now()): " + new Date(Date.getDate()));
+
+    retVal = message.getDate().getTime() + deletionMap.keepDays * 24 * 60 * 60 * 1000 < Date.now() ? true : false;
+
+    Logger.log(retVal);
+    return retVal;
+}
+
+function checkMessagesForDeletion_test() {
     gThreads = GmailApp.getInboxThreads();
 
     for (i in gThreads) {
