@@ -30,6 +30,9 @@ function LabelMapping(from, subjectKeyWords, labels) {
 }
 
 function DeletionMapping(label, operation, keepDays) {
+    // todo: change operation to an array of k-v-pairs. key describes the operation and value is a string representing the operation-parameters
+    // e.g. {"keepdays","3"} -> operation keepDays , parameter = 3 -> keep messages for 3 days before deleting
+    // or json-like String Array: {"keepDays": "3", "subjectContains": "blabla"} etc. ~> may require a somewhat more sophisticated lexer to process the json-string accordingly
     this.label = label;
     this.operation = operation;
     this.keepDays = keepDays;
